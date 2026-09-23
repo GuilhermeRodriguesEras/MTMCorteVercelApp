@@ -2599,7 +2599,7 @@ def gerar_proposta():
             "Prezado cliente, seguem abaixo proposta comercial com "
             "pagamento à vista com desconto e nossos dados bancários:\n\n"
             "Segue nossos dados bancários:\n"
-            "BRFER Comércio de Ferramentas LTDA\n"
+            "MTMcortes \n"
             "CNPJ 40.954.410/0001-96\n"
             "Banco: 341 – Itaú\n"
             "Agência: 8811\n"
