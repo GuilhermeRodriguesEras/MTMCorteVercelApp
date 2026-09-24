@@ -3444,13 +3444,20 @@ def matrizFiltroPropostas():
             return 'Sarah'
         else:
             return ''
+
+    def LimitData(data_limite: str, data_atual: str) -> bool:
+        formato = "%Y-%m-%d"
         
+        limite = datetime.strptime(data_limite, formato)
+        atual = datetime.strptime(data_atual, formato)
+
+        return atual <= limite
+    
     data_inicio = request.args.get("data_inicio")
     data_fim = request.args.get("data_fim")
     vendedorGetParamether = request.args.get("vendedor").lower()
     situacoes = request.args.getlist("situacoes")
 
-    #TODO adicionar tratamento para o situacoes
     arrayPropostas = listarPropostas(f"dataInicio={data_inicio}&data_fim={data_fim}")
 
     linhasDoDF = []
@@ -3459,6 +3466,9 @@ def matrizFiltroPropostas():
     keep = True
 
     for i in range(len(itens)):
+        if not LimitData(data_fim, itens[i].get("data")):
+            continue
+
         IdProposta = itens[i].get("id")
         requestPropostaMomentanea = tiny_request("GET", f"/orcamentos/{IdProposta}")
         requestPropostaMomentanea = resposta_json(requestPropostaMomentanea)
@@ -3475,8 +3485,6 @@ def matrizFiltroPropostas():
         vendedor = getVendedor(aux1, aux2)
         situacao = itens[i].get("situacao", "")
 
-        print(requestPropostaMomentanea)
-
         try:
             idContato = requestPropostaMomentanea.get("contato").get("id")
             contato = tiny_request("GET", f"/contatos/{idContato}")
@@ -3484,7 +3492,10 @@ def matrizFiltroPropostas():
         except:
             contato = ''
 
-        ProdutosProposta = requestPropostaMomentanea.get("itens", [])
+        try:
+            ProdutosProposta = requestPropostaMomentanea.get("itens", [])
+        except:
+            continue
 
         if vendedorGetParamether != "todos" and vendedorGetParamether != vendedor.lower():
             keep = False
@@ -3508,8 +3519,11 @@ def matrizFiltroPropostas():
                     line[11] = contato.get("email", "")
                 except:
                     pass
-                line[12] = requestPropostaMomentanea.get("extras").get("desconto", 0)
-                line[13] = requestPropostaMomentanea.get("extras").get("frete", 0)
+                try:
+                    line[12] = requestPropostaMomentanea.get("extras").get("desconto", 0)
+                    line[13] = requestPropostaMomentanea.get("extras").get("frete", 0)
+                except:
+                    pass
 
                 linhasDoDF.append(line)
 
