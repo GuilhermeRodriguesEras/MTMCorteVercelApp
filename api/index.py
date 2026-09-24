@@ -3477,9 +3477,12 @@ def matrizFiltroPropostas():
 
         print(requestPropostaMomentanea)
 
-        idContato = requestPropostaMomentanea.get("contato").get("id")
-        contato = tiny_request("GET", f"/contatos/{idContato}")
-        contato = resposta_json(contato)
+        try:
+            idContato = requestPropostaMomentanea.get("contato").get("id")
+            contato = tiny_request("GET", f"/contatos/{idContato}")
+            contato = resposta_json(contato)
+        except:
+            contato = ''
 
         ProdutosProposta = requestPropostaMomentanea.get("itens", [])
 
