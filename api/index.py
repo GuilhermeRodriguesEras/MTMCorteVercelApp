@@ -3430,89 +3430,8 @@ def listarPropostas(args = ''):
         }), 500
 
 
-def gerar_excel(titulos, linhasDoDF):
-    wb = Workbook()
-    ws = wb.active
-    ws.title = "Dados"
-
-    borda = Border(
-        left=Side(style="thin", color="000000"),
-        right=Side(style="thin", color="000000"),
-        top=Side(style="thin", color="000000"),
-        bottom=Side(style="thin", color="000000")
-    )
-
-    preenchimento_cabecalho = PatternFill(
-        fill_type="solid",
-        fgColor="000000"
-    )
-
-    fonte_cabecalho = Font(
-        color="FFFFFF",
-        bold=True
-    )
-
-    alinhamento = Alignment(
-        horizontal="center",
-        vertical="center"
-    )
-
-    for coluna, titulo in enumerate(titulos, start=1):
-        celula = ws.cell(
-            row=1,
-            column=coluna,
-            value=titulo
-        )
-
-        celula.fill = preenchimento_cabecalho
-        celula.font = fonte_cabecalho
-        celula.border = borda
-        celula.alignment = alinhamento
-
-    for numero_linha, linha in enumerate(linhasDoDF, start=2):
-
-        for numero_coluna, valor in enumerate(linha, start=1):
-
-            celula = ws.cell(
-                row=numero_linha,
-                column=numero_coluna,
-                value=valor
-            )
-
-            celula.border = borda
-            celula.alignment = alinhamento
-
-    for coluna in ws.columns:
-
-        maior_tamanho = 0
-        letra_coluna = coluna[0].column_letter
-
-        for celula in coluna:
-
-            if celula.value is not None:
-                tamanho = len(str(celula.value))
-
-                if tamanho > maior_tamanho:
-                    maior_tamanho = tamanho
-
-        largura = maior_tamanho + 2
-
-        if largura < 10:
-            largura = 10
-
-        ws.column_dimensions[letra_coluna].width = largura
-
-    ws.row_dimensions[1].height = 24
-    arquivo = BytesIO()
-
-    wb.save(arquivo)
-
-    arquivo.seek(0)
-
-    return arquivo
-
-@app.route("/api/listarParaOSite", methods=["GET"])
-def listarParaOSite():
+@app.route("/api/matrizFiltroPropostas", methods=["GET"])
+def matrizFiltroPropostas():
 
     def getVendedor(saudacao, responsavel):
         if 'rose' in saudacao or 'rose' in responsavel:
@@ -3521,9 +3440,11 @@ def listarParaOSite():
             return 'Amandha'
         elif 'jadhy' in saudacao or 'jadhy' in responsavel:
             return 'Jadhy'
+        elif 'sarah' in saudacao or 'sarah' in responsavel:
+            return 'Sarah'
         else:
             return ''
-
+        
     data_inicio = request.args.get("data_inicio")
     data_fim = request.args.get("data_fim")
     vendedorGetParamether = request.args.get("vendedor").lower()
@@ -3531,9 +3452,6 @@ def listarParaOSite():
 
     #TODO adicionar tratamento para o situacoes
     arrayPropostas = listarPropostas(f"dataInicio={data_inicio}&data_fim={data_fim}")
-
-    titulos = ['Nº Da Proposta', 'Data', 'Data Prox Contato', 'Vendedor', 'Situação', 'Produto', 
-               'Valor', 'Nome Cliente', 'Aos Cuidados', 'Fone', 'Celular', 'E-mail', 'Desconto', 'Frete']
 
     linhasDoDF = []
     itens = arrayPropostas.get("itens", [])
@@ -3545,8 +3463,14 @@ def listarParaOSite():
         requestPropostaMomentanea = tiny_request("GET", f"/orcamentos/{IdProposta}")
         requestPropostaMomentanea = resposta_json(requestPropostaMomentanea)
 
-        aux1 = requestPropostaMomentanea.get("assinatura").get("saudacao", '').lower()
-        aux2 = requestPropostaMomentanea.get("assinatura").get("responsavel", '').lower()
+        try:
+            aux1 = requestPropostaMomentanea.get("assinatura").get("saudacao", '').lower()
+        except:
+            aux1 = ''
+        try:
+            aux2 = requestPropostaMomentanea.get("assinatura").get("responsavel", '').lower()
+        except:
+            aux2 = ''
 
         vendedor = getVendedor(aux1, aux2)
         situacao = itens[i].get("situacao", "")
@@ -3586,11 +3510,4 @@ def listarParaOSite():
 
         keep = True
 
-    arquivo = gerar_excel(titulos, linhasDoDF)
-
-    return send_file(
-        arquivo,
-        as_attachment=True,
-        download_name="FiltroPropostas.xlsx",
-        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-    )
+    return linhasDoDF
