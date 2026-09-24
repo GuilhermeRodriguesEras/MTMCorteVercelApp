@@ -3475,6 +3475,8 @@ def matrizFiltroPropostas():
         vendedor = getVendedor(aux1, aux2)
         situacao = itens[i].get("situacao", "")
 
+        print(requestPropostaMomentanea)
+
         idContato = requestPropostaMomentanea.get("contato").get("id")
         contato = tiny_request("GET", f"/contatos/{idContato}")
         contato = resposta_json(contato)
