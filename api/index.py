@@ -533,6 +533,10 @@ def gerar_pdf_proposta(dados_front, dados_orcamento, contato, orcamento_id):
     valor_3x = float_seguro(resumo.get("parcela_3x"))
     valor_12x = float_seguro(resumo.get("parcela_12x"))
 
+    print("-----------------------------------------------------------")
+    print(resumo)
+    print("-----------------------------------------------------------")
+
     if not valor_avista:
         valor_avista = total_carrinho * 0.98
 
