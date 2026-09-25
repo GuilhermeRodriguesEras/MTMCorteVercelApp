@@ -2240,10 +2240,7 @@ def carregar_imagem_produto(url, max_width=18 * mm, max_height=18 * mm):
         return None
 
 
-def localizar_produto_por_sku(
-    sku
-):
-
+def localizar_produto_por_sku(sku):
     if not sku:
         return None
 
@@ -2472,6 +2469,10 @@ def gerar_proposta():
             carrinho,
             start=1
         ):
+
+            print("--------------------------------------------------------")
+            print(item)
+            print("--------------------------------------------------------")
 
             sku = item.get(
                 "sku"
