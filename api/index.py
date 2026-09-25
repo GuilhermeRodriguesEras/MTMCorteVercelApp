@@ -2465,18 +2465,9 @@ def gerar_proposta():
 
         itens_tiny = []
 
-        for indice, item in enumerate(
-            carrinho,
-            start=1
-        ):
+        for indice, item in enumerate(carrinho,start=1):
 
-            print("--------------------------------------------------------")
-            print(item)
-            print("--------------------------------------------------------")
-
-            sku = item.get(
-                "sku"
-            )
+            sku = (item.get("nome").split('Ref. ')[1])[:-1]
 
             if sku is not None:
                 sku = str(sku).strip()
@@ -2496,11 +2487,7 @@ def gerar_proposta():
 
                 }), 400
 
-
-            produto = localizar_produto_por_sku(
-                sku
-            )
-
+            produto = localizar_produto_por_sku(sku)
 
             if not produto:
 
@@ -2529,10 +2516,7 @@ def gerar_proposta():
                 }), 404
 
 
-            produto_id = produto.get(
-                "id"
-            )
-
+            produto_id = produto.get("id")
 
             if not produto_id:
 
