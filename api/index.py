@@ -3482,4 +3482,4 @@ def testeApiCommands():
 
     response = requests.get(url, headers=headers)
 
-    return jsonify({response}), 200
+    return response.json
