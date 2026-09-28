@@ -1650,6 +1650,7 @@ def localizar_contato(cpf_cnpj):
 
     dados = resposta_json(response)
     print("LOCALIZAR CONTATO --------------------------")
+    print(f"SUPOSTO CPF_CNPJ: {documento}")
     print(dados)
     print("")
 
@@ -2589,9 +2590,6 @@ def gerar_proposta():
 
 
         if response_get.ok:
-
-            # O PDF é produzido localmente pelo backend, usando os dados
-            # efetivamente persistidos no Tiny e os dados do formulário.
             pdf_buffer = gerar_pdf_proposta(
                 dados_front,
                 dados_orcamento,
