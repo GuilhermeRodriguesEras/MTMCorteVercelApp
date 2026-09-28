@@ -1639,7 +1639,7 @@ def limpar_documento(valor):
 
 
 def localizar_contato(cpf_cnpj, nome=None, busca_exaustiva=False):
-    documento = limpar_documento(cpf_cnpj)
+    documento = cpf_cnpj
 
     if not documento:
         raise TinyAPIError("CPF/CNPJ do cliente não informado.")
@@ -1709,9 +1709,7 @@ def localizar_contato(cpf_cnpj, nome=None, busca_exaustiva=False):
 
         vistos.add(contato_id)
 
-        documento_tiny = limpar_documento(
-            contato.get("cpfCnpj")
-        )
+        documento_tiny = contato.get("cpfCnpj")
 
         if documento_tiny == documento:
             return contato
