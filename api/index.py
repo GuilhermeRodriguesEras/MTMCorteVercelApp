@@ -3471,3 +3471,15 @@ def matrizFiltroPropostas():
         keep = True
 
     return linhasDoDF
+
+
+@app.route("/api/testes", methods=["GET"])
+def testeApiCommands():
+
+    url = request.args.get("url")
+
+    headers = {"Authorization": f"Bearer {obter_access_token()}"}
+
+    response = request.get(url, headers=headers)
+
+    return jsonify({response}), 200
