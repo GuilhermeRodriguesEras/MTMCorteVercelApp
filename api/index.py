@@ -3482,4 +3482,4 @@ def testeApiCommands():
 
     response = requests.get(url, headers=headers)
 
-    return response.json
+    print(response.text)
