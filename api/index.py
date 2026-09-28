@@ -3480,6 +3480,6 @@ def testeApiCommands():
 
     headers = {"Authorization": f"Bearer {obter_access_token()}"}
 
-    response = request.get(url, headers=headers)
+    response = requests.get(url, headers=headers)
 
     return jsonify({response}), 200
