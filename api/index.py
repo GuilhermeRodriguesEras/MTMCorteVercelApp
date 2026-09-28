@@ -3225,6 +3225,8 @@ def matrizFiltroPropostas():
     vendedorGetParamether = request.args.get("vendedor").lower()
     situacoes = request.args.getlist("situacoes")
 
+    print(situacoes)
+
     arrayPropostas = listarPropostas(f"dataInicio={data_inicio}&data_fim={data_fim}")
 
     linhasDoDF = []
@@ -3251,6 +3253,7 @@ def matrizFiltroPropostas():
 
         vendedor = getVendedor(aux1, aux2)
         situacao = itens[i].get("situacao", "")
+        situacao = situacao.lower()
 
         if vendedorGetParamether != "todos" and vendedorGetParamether != vendedor.lower():
             continue
