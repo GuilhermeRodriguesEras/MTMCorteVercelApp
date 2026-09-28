@@ -1862,9 +1862,7 @@ def obter_ou_criar_contato(dados_front):
         {}
     )
 
-    documento = limpar_documento(
-        cliente.get("cpf_cnpj")
-    )
+    documento = cliente.get("cpf_cnpj")
 
     if not documento:
         raise TinyAPIError(
