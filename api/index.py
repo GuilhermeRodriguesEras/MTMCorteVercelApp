@@ -3483,3 +3483,5 @@ def testeApiCommands():
     response = requests.get(url, headers=headers)
 
     print(response.text)
+
+    return response.text
