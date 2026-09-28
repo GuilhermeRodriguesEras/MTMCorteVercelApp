@@ -1631,138 +1631,90 @@ def tiny_request(
 
     return response
 
-def limpar_documento(
-    valor
-):
-
+def limpar_documento(valor):
     if not valor:
-
         return ""
 
-
-    return "".join(
-
-        c
-
-        for c in str(
-            valor
-        )
-
-        if c.isdigit()
-    )
+    return "".join(c for c in str(valor) if c.isdigit())
 
 
-def localizar_contato(
-    cpf_cnpj,
-    nome=None,
-    busca_exaustiva=False
-):
+def localizar_contato(cpf_cnpj, nome=None, busca_exaustiva=False):
     documento = limpar_documento(cpf_cnpj)
 
     if not documento:
-        raise TinyAPIError(
-            "CPF/CNPJ do cliente não informado."
-        )
+        raise TinyAPIError("CPF/CNPJ do cliente não informado.")
 
-    situacoes = [None, "B", "A", "I", "E"]
     vistos = set()
+    params = {"cpfCnpj": documento}
 
-    for situacao in situacoes:
-        params = {
-            "cpfCnpj": documento,
-            "limit": 100,
-            "offset": 0
-        }
+    response = tiny_request("GET","/contatos", params=params)
 
-        if situacao:
-            params["situacao"] = situacao
+    dados = resposta_json(response)
+    print(dados)
 
-        response = tiny_request(
-            "GET",
-            "/contatos",
-            params=params
-        )
+    if not response.ok:
+        texto_erro = json.dumps(dados,ensure_ascii=False).lower()
 
-        dados = resposta_json(response)
-
-        print(
-            "Consulta contato por CPF/CNPJ:",
-            documento,
-            "situação:",
-            situacao or "todas",
-            "HTTP:",
-            response.status_code
-        )
-
-        if not response.ok:
-
-            texto_erro = json.dumps(
-                dados,
-                ensure_ascii=False
-            ).lower()
-
-            contato_nao_encontrado = (
-                "cpf/cnpj not found" in texto_erro
-                or
-                "cpf/cnpj não encontrado" in texto_erro
-                or
-                "cpf/cnpj nao encontrado" in texto_erro
-                or
-                "cpf ou cnpj não encontrado" in texto_erro
-                or
-                "cpf ou cnpj nao encontrado" in texto_erro
-                or
-                (
-                    response.status_code == 404
-                    and (
-                        "not found" in texto_erro
-                        or
-                        "não encontrado" in texto_erro
-                        or
-                        "nao encontrado" in texto_erro
-                    )
+        contato_nao_encontrado = (
+            "cpf/cnpj not found" in texto_erro
+            or
+            "cpf/cnpj não encontrado" in texto_erro
+            or
+            "cpf/cnpj nao encontrado" in texto_erro
+            or
+            "cpf ou cnpj não encontrado" in texto_erro
+            or
+            "cpf ou cnpj nao encontrado" in texto_erro
+            or
+            (
+                response.status_code == 404
+                and (
+                    "not found" in texto_erro
+                    or
+                    "não encontrado" in texto_erro
+                    or
+                    "nao encontrado" in texto_erro
                 )
             )
-
-            if contato_nao_encontrado:
-                print(
-                    "CPF/CNPJ não encontrado no Tiny. "
-                    "O contato será criado automaticamente."
-                )
-
-                return None
-
-            if situacao:
-                continue
-            
-            raise TinyAPIError(
-                "Erro ao consultar contato no Tiny.",
-                response.status_code,
-                dados
-            )
-
-        contatos = dados.get(
-            "itens",
-            []
         )
 
-        if not isinstance(contatos, list):
-            contatos = []
-
-        for contato in contatos:
-            contato_id = contato.get("id")
-
-            if contato_id in vistos:
-                continue
-
-            vistos.add(contato_id)
-
-            documento_tiny = limpar_documento(
-                contato.get("cpfCnpj")
+        if contato_nao_encontrado:
+            print(
+                "CPF/CNPJ não encontrado no Tiny. "
+                "O contato será criado automaticamente."
             )
 
-            if documento_tiny == documento:
-                return contato
+            return None
+
+        
+        raise TinyAPIError(
+            "Erro ao consultar contato no Tiny.",
+            response.status_code,
+            dados
+        )
+
+    contatos = dados.get(
+        "itens",
+        []
+    )
+
+    if not isinstance(contatos, list):
+        contatos = []
+
+    for contato in contatos:
+        contato_id = contato.get("id")
+
+        if contato_id in vistos:
+            continue
+
+        vistos.add(contato_id)
+
+        documento_tiny = limpar_documento(
+            contato.get("cpfCnpj")
+        )
+
+        if documento_tiny == documento:
+            return contato
             
     if nome:
         response = tiny_request(
