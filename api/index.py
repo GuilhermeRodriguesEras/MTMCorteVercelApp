@@ -992,6 +992,10 @@ def oauth_autorizar():
         url
     )
 
+@app.route("/api/acessToken", methods=["GET"])
+def getAcessToken():
+    return redis_get(TINY_TOKEN_KEY)
+
 class HTMLParaTexto(HTMLParser):
     def __init__(self):
         super().__init__()
