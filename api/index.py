@@ -3200,6 +3200,14 @@ def listarPropostas(args = ''):
             "detalhes": str(e)
         }), 500
 
+@app.route("/api/listarPropostasForAPI", methods=["GET"])
+def listarPropostasForAPI():
+    data_inicio = request.args.get("data_inicio")
+    data_fim    = request.args.get("data_fim")
+        
+    response = listarPropostas(f"dataInicio={data_inicio}&data_fim={data_fim}")
+
+    return response.get("itens", [])
 
 @app.route("/api/matrizFiltroPropostas", methods=["GET"])
 def matrizFiltroPropostas():
