@@ -3324,3 +3324,86 @@ def testeApiCommands():
     print(response.text)
 
     return response.text
+
+
+@app.route("/api/linhasFiltroPropostas", methods=["GET"])
+def linhasFiltroPropostas():
+
+    def getVendedor(saudacao, responsavel):
+        if 'rose' in saudacao or 'rose' in responsavel:
+            return 'Rose'
+        elif 'amandha' in saudacao or 'amandha' in responsavel:
+            return 'Amandha'
+        elif 'jadhy' in saudacao or 'jadhy' in responsavel:
+            return 'Jadhy'
+        elif 'sarah' in saudacao or 'sarah' in responsavel:
+            return 'Sarah'
+        else:
+            return ''
+
+    def LimitData(data_limite: str, data_atual: str) -> bool:
+        formato = "%Y-%m-%d"
+        
+        limite = datetime.strptime(data_limite, formato)
+        atual = datetime.strptime(data_atual, formato)
+
+        return atual <= limite
+    
+    item = request.get_json()
+    item = item.get('item')
+    print(item)
+    linhas = []
+    
+    requestPropostaMomentanea = tiny_request("GET", f"/orcamentos/{item.get("id")}")
+    requestPropostaMomentanea = resposta_json(requestPropostaMomentanea)
+
+    try:
+        aux1 = requestPropostaMomentanea.get("assinatura").get("saudacao", '').lower()
+    except:
+        aux1 = ''
+    try:
+        aux2 = requestPropostaMomentanea.get("assinatura").get("responsavel", '').lower()
+    except:
+        aux2 = ''
+
+    vendedor = getVendedor(aux1, aux2)
+    situacao = item.get("situacao", "")
+
+    try:
+        idContato = requestPropostaMomentanea.get("contato").get("id")
+        contato = tiny_request("GET", f"/contatos/{idContato}")
+        contato = resposta_json(contato)
+    except:
+        contato = ''
+
+    try:
+        ProdutosProposta = requestPropostaMomentanea.get("itens", [])
+    except:
+        ProdutosProposta = []
+
+    for j in range(len(ProdutosProposta)):
+        line = ['N/A']*14
+        line[0]  = item.get("numeroProposta")
+        line[1]  = item.get("data")
+        line[2]  = item.get("dataProximoContato", "")
+        line[3]  = vendedor
+        line[4]  = situacao
+        line[5]  = ProdutosProposta[j].get("produto").get("descricao", "")
+        line[6]  = float(ProdutosProposta[j].get("valorUnitario")) * int(ProdutosProposta[j].get("quantidade"))
+        try:
+            line[7]  = contato.get("nome", "")
+            line[8]  = contato.get("observacoesDoContato", "")
+            line[9]  = contato.get("telefone", "")
+            line[10] = contato.get("celular", "")
+            line[11] = contato.get("email", "")
+        except:
+            pass
+        try:
+            line[12] = requestPropostaMomentanea.get("extras").get("desconto", 0)
+            line[13] = requestPropostaMomentanea.get("extras").get("frete", 0)
+        except:
+            pass
+
+        linhas.append(line)
+
+    return linhas
