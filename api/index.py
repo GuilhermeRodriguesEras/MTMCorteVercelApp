@@ -3414,6 +3414,7 @@ def extratosBancarios():
     data_fim = request.args.get("data_fim")
 
     response = tiny_request("get", f"/extratos-bancarios?dataInicial={data_inicio}&dataFinal={data_fim}")
+    print(response)
     response = resposta_json(response)
 
     return response
