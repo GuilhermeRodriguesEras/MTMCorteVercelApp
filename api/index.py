@@ -3407,3 +3407,22 @@ def linhasFiltroPropostas():
         linhas.append(line)
 
     return linhas
+
+@app.route("/api/extratosBancarios", methods=["GET"])
+def extratosBancarios():
+    data_inicio = request.args.get("data_inicio")
+    data_fim = request.args.get("data_fim")
+
+    response = tiny_request("get", f"/extratos-bancarios?dataInicial={data_inicio}&dataFinal={data_fim}")
+    response = resposta_json(response)
+
+    return response
+
+@app.route("/api/buscarExtratoEspecifico", methods=["GET"])
+def buscarExtratoEspecifico():
+    idExtrato = request.args.get("id")
+
+    response = tiny_request("get", f"/extratos-bancarios/{idExtrato}")
+    response = resposta_json(response)
+
+    return response
