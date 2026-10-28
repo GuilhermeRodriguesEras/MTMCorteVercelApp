@@ -3221,6 +3221,8 @@ def matrizFiltroPropostas():
             return 'Jadhy'
         elif 'sarah' in saudacao or 'sarah' in responsavel:
             return 'Sarah'
+        elif 'milena' in saudacao or 'sarah' in responsavel:
+            return 'Milena'
         else:
             return ''
 
@@ -3338,6 +3340,8 @@ def linhasFiltroPropostas():
             return 'Jadhy'
         elif 'sarah' in saudacao or 'sarah' in responsavel:
             return 'Sarah'
+        elif 'milena' in saudacao or 'sarah' in responsavel:
+            return 'Milena'   
         else:
             return ''
 
